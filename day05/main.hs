@@ -19,7 +19,7 @@ int :: ReadP Int
 int = read <$> many1 (satisfy isDigit)
 
 line :: ReadP String
-line = many (satisfy (/= '\n')) <* char '\n'
+line = manyTill get (char '\n')
 
 movement :: ReadP (Int, Int, Int)
 movement = (,,)
