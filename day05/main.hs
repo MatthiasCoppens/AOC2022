@@ -1,4 +1,4 @@
-import Control.Monad.State.Lazy hiding (get)
+import Control.Monad.State.Lazy hiding (get)   -- Collides with ReadP.get
 import Data.Char
 import Data.List
 import Data.Maybe
@@ -7,6 +7,11 @@ import Text.ParserCombinators.ReadP
 crate :: ReadP (Maybe Char)
 crate = (Just <$> (char '[' *> get <* char ']')) +++ (Nothing <$ string "   ")
 
+-- Format:
+--  [[top of stack 1, ..., bottom of stack 1],
+--   [top of stack 2, ..., bottom of stack 2],
+--   ...
+--  ]
 crates :: ReadP [[Char]]
 crates = map catMaybes . transpose <$> sepBy (sepBy crate (char ' ')) (char '\n')
 
@@ -25,15 +30,15 @@ movement = (,,)
 procedure :: ReadP ([[Char]], [(Int, Int, Int)])
 procedure = (,) <$> (crates <* line <* line) <*> sepBy movement (char '\n')
 
-getCrates :: Int -> Int -> [[a]] -> ([a], [[a]])
-getCrates amount = go
+getCrates :: Int -> Int -> State [[a]] [a]
+getCrates amount = state . go
     where
         go i (xs : xss) = case i of
             1 -> let (xs', xs'') = splitAt amount xs in (xs', xs'' : xss)
             _ -> let (xs', xss') = go (i - 1) xss in (xs', xs : xss')
 
-putCrates :: Int -> [a] -> [[a]] -> [[a]]
-putCrates i xs' = go i
+putCrates :: Int -> [a] -> State [[a]] ()
+putCrates i xs' = modify $ go i
     where
         go i (xs : xss) = case i of
             1 -> (xs' ++ xs) : xss
@@ -41,13 +46,11 @@ putCrates i xs' = go i
 
 mover9000, mover9001 :: (Int, Int, Int) -> State [[a]] ()
 
-mover9000 (amount, from, to) = replicateM_ amount $ do
-    xs <- state $ getCrates 1 from
-    modify $ putCrates to xs
+mover9000 (amount, from, to) = replicateM_ amount $
+    getCrates 1 from >>= putCrates to
 
-mover9001 (amount, from, to) = do
-    xs <- state $ getCrates amount from
-    modify $ putCrates to xs
+mover9001 (amount, from, to) =
+    getCrates amount from >>= putCrates to
 
 main :: IO ()
 main = do
