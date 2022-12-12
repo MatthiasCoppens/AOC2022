@@ -30,6 +30,7 @@ crt = map (bool ' ' '#') .
 
 main :: IO ()
 main = do
+    putStrLn "Set terminal width to 40 charachters"
     program <- fst . last . readP_to_S cmds <$> getContents
     let xs = run program
     print $ sum [i * xs !! (i - 1) | i <- [20, 60, 100, 140, 180, 220]]
