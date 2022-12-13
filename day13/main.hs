@@ -35,7 +35,7 @@ pair = (,) <$> (packet <* char '\n') <*> packet
 signal :: ReadP [(Packet, Packet)]
 signal = sepBy pair (string "\n\n")
 
-solve1 :: [(Packet, Packet)] -> Int
+solve1, solve2 :: [(Packet, Packet)] -> Int
 solve1 = sum . map fst . filter (\(n, (l, r)) -> l < r) . zip [1 ..]
 solve2 pps =
     let ps = sort $ foldr (\(l, r) -> ([l, r] ++)) [] pps
