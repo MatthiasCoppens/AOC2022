@@ -11,6 +11,7 @@ instance Show Packet where
 instance Eq Packet where
     (==) l r = compare l r == EQ
 
+-- This is basically the brain of this solution
 instance Ord Packet where
     compare (Leaf l) (Leaf r) = compare l r
     compare (Node (l : ls)) (Node (r : rs)) = case compare l r of
