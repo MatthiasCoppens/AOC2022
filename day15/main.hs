@@ -24,17 +24,20 @@ pairs = sepBy pair (char '\n')
 manhattan :: Coord -> Coord -> Int
 manhattan (x0, y0) (x1, y1) = abs (x0 - x1) + abs (y0 - y1)
 
+-- Sorted x-ranges not containing a beacon at row y
 rangesAtY :: Int -> Coord -> Coord -> [(Int, Int)]
 rangesAtY y r0@(x0, y0) r1@(x1, y1) = case (manhattan r0 r1) - abs (y - y0) of
     dx  | dx < 0    -> []
         | y == y1   -> [(x0 - dx, x1 - 1), (x1 + 1, x0 + dx)]
         | otherwise -> [(x0 - dx, x0 + dx)]
 
+-- x-range not containing the unknown beacon
 rangeAtYFillBeacons :: Int -> Coord -> Coord -> Maybe (Int, Int)
 rangeAtYFillBeacons y r0 r1 = case rangesAtY y r0 r1 of
     [] -> Nothing
     ps -> Just (fst (head ps), snd (last ps))
 
+-- Merge unsorted ranges into sorted ranges
 merge :: [(Int, Int)] -> [(Int, Int)]
 merge = go . sort
     where
