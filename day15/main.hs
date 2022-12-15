@@ -24,14 +24,14 @@ pairs = sepBy pair (char '\n')
 manhattan :: Coord -> Coord -> Int
 manhattan (x0, y0) (x1, y1) = abs (x0 - x1) + abs (y0 - y1)
 
-rangeAtY :: Int -> Coord -> Coord -> [(Int, Int)]
-rangeAtY y r0@(x0, y0) r1@(x1, y1) = case (manhattan r0 r1) - abs (y - y0) of
+rangesAtY :: Int -> Coord -> Coord -> [(Int, Int)]
+rangesAtY y r0@(x0, y0) r1@(x1, y1) = case (manhattan r0 r1) - abs (y - y0) of
     dx  | dx < 0    -> []
         | y == y1   -> [(x0 - dx, x1 - 1), (x1 + 1, x0 + dx)]
         | otherwise -> [(x0 - dx, x0 + dx)]
 
 rangeAtYFillBeacons :: Int -> Coord -> Coord -> Maybe (Int, Int)
-rangeAtYFillBeacons y r0 r1 = case rangeAtY y r0 r1 of
+rangeAtYFillBeacons y r0 r1 = case rangesAtY y r0 r1 of
     [] -> Nothing
     ps -> Just (fst (head ps), snd (last ps))
 
@@ -45,7 +45,7 @@ merge = go . sort
 
 solve1 :: Int -> [(Coord, Coord)] -> Int
 solve1 y ps = sum $ map (\(x0, x1) -> x1 - x0 + 1) $ merge
-    [range | (sensor, beacon) <- ps, range <- rangeAtY y sensor beacon]
+    [range | (sensor, beacon) <- ps, range <- rangesAtY y sensor beacon]
 
 solve2 :: [(Coord, Coord)] -> Int
 solve2 ps = head
