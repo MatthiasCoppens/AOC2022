@@ -39,15 +39,17 @@ move1 dirs g (r, c)
 moveNoCollisionCheck :: [Dir] -> S.Set Coord -> M.Map Coord Coord
 moveNoCollisionCheck dirs g = M.fromSet (move1 dirs g) g
 
+invert :: (Ord a, Ord b) => M.Map a b -> M.Map b (S.Set a)
+invert = M.foldrWithKey
+    (\from to -> M.insertWith S.union to (S.singleton from)) M.empty
+
 -- First a create map (M.Map fromCoord toCoord),
 -- then a map (M.Map toCoord fromCoordSet).
 -- The next set is the union of the toCoords with (S.size fromCoordSet == 1)
 -- with the fromCoordSets with size > 1.
 move :: [Dir] -> S.Set Coord -> S.Set Coord
 move dirs g =
-    let m = M.foldrWithKey
-            (\from to -> M.insertWith S.union to (S.singleton from)) M.empty $
-            moveNoCollisionCheck dirs g
+    let m = invert $ moveNoCollisionCheck dirs g
         (m', m'') = M.partition ((== 1) . S.size) m
     in  S.unions $ M.keysSet m' : M.elems m''
 
