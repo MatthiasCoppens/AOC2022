@@ -13,25 +13,25 @@ grid s = S.fromAscList
 
 move1 :: [Dir] -> S.Set Coord -> Coord -> Coord
 move1 dirs g (r, c)
-    | g `S.disjoint` (S.fromList
+    | g `S.disjoint` (S.fromAscList
         [(r + dr, c + dc) | dr <- [-1 .. 1], dc <- [-1 .. 1], (dr, dc) /= (0, 0)]
         ) = (r, c)
     | otherwise = go dirs
     where
         go (North : dirs)
-            | g `S.disjoint` (S.fromList [(r-1, c-1), (r-1, c), (r-1, c+1)])
+            | g `S.disjoint` (S.fromAscList [(r-1, c-1), (r-1, c), (r-1, c+1)])
                 = (r-1, c)
             | otherwise = go dirs
         go (South : dirs)
-            | g `S.disjoint` (S.fromList [(r+1, c-1), (r+1, c), (r+1, c+1)])
+            | g `S.disjoint` (S.fromAscList [(r+1, c-1), (r+1, c), (r+1, c+1)])
                 = (r+1, c)
             | otherwise = go dirs
         go (West : dirs)
-            | g `S.disjoint` (S.fromList [(r-1, c-1), (r, c-1), (r+1, c-1)])
+            | g `S.disjoint` (S.fromAscList [(r-1, c-1), (r, c-1), (r+1, c-1)])
                 = (r, c-1)
             | otherwise = go dirs
         go (East : dirs)
-            | g `S.disjoint` (S.fromList [(r-1, c+1), (r, c+1), (r+1, c+1)])
+            | g `S.disjoint` (S.fromAscList [(r-1, c+1), (r, c+1), (r+1, c+1)])
                 = (r, c+1)
             | otherwise = go dirs
         go [] = (r, c)
