@@ -40,8 +40,7 @@ moveNoCollisionCheck :: [Dir] -> S.Set Coord -> M.Map Coord Coord
 moveNoCollisionCheck dirs g = M.fromSet (move1 dirs g) g
 
 invert :: (Ord a, Ord b) => M.Map a b -> M.Map b (S.Set a)
-invert = M.foldrWithKey
-    (\from to -> M.insertWith S.union to (S.singleton from)) M.empty
+invert = M.foldrWithKey (\k v -> M.insertWith S.union v (S.singleton k)) M.empty
 
 -- First a create map (M.Map fromCoord toCoord),
 -- then a map (M.Map toCoord fromCoordSet).
