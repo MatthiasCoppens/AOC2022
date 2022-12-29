@@ -37,6 +37,9 @@ vars :: ReadP Vars
 vars = M.fromList <$>
     sepBy ((,) <$> (name <* string ": ") <*> (Unevaluated <$> op)) (char '\n')
 
+-- Code that's commented out does memoization.
+-- Since the input is pretty small, memoization adds to much overhead,
+-- making the code slower.
 eval :: Op -> State Vars Solution
 eval (Const n) = return $ n % 1
 eval (Var x) = do
@@ -45,7 +48,7 @@ eval (Var x) = do
         Evaluated n   -> return n
         Unevaluated e -> do
             n <- eval e
-            modify $ M.insert x $ Evaluated n
+            -- modify $ M.insert x $ Evaluated n
             return n
 eval (l :+: r) = (+) <$> eval (Var l) <*> eval (Var r)
 eval (l :-: r) = (-) <$> eval (Var l) <*> eval (Var r)
