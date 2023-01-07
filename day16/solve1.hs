@@ -61,7 +61,10 @@ cutOff :: Int -> Tree a -> Tree a
 cutOff 1 (Tree x _) = Tree x []
 cutOff n (Tree x children) = Tree x $ map (cutOff (n - 1)) children
 
+-- Presumably it'd take between 10 and 25 minutes to open all valves.
+-- Only paths taking 25 minutes at most are calculated, and the first 10
+-- minutes are bruteforced to kickstart the DFS.
 main :: IO ()
 main = do
     graph <- fst . last . readP_to_S valves <$> getContents
-    mapM_ print $ scanMax $ dfs $ bruteForce 10 $ cutOff 30 $ scores 30 $ prune $ tree graph
+    mapM_ print $ scanMax $ dfs $ bruteForce 10 $ cutOff 25 $ scores 30 $ prune $ tree graph
